@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directorio Territorial Occidente — Hevéxicos</title>
+    <style>
+        :root {
+            --fondo: #F8FAFC;
+            --texto: #1E1B4B;
+            --azul-claro: #E0E7FF;
+            --morado: #7C3AED;
+            --azul: #2563EB;
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; background: var(--fondo); margin: 0; padding: 20px; display: none; color: var(--texto); }
+
+        h1 { text-align: center; color: #2E1065; font-size: 22px; border-bottom: 3px solid #2E1065; padding-bottom: 10px; margin-bottom: 18px; }
+
+        /* ── MUNICIPIOS ── */
+        .municipio { margin-bottom: 12px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(46,16,101,0.15); }
+        .m-header { width: 100%; padding: 16px 18px; text-align: left; border: none; cursor: pointer; color: white; font-weight: bold; font-size: 16px; display: flex; justify-content: space-between; letter-spacing: 1px; }
+        .m-header:hover { filter: brightness(1.1); }
+
+        .bg-anza        { background: #1E1B4B; }
+        .bg-buritica     { background: #312E81; }
+        .bg-caicedo      { background: #3730A3; }
+        .bg-ebejico      { background: #4338CA; }
+        .bg-liborina     { background: #4F46E5; }
+        .bg-olaya        { background: #5B21B6; }
+        .bg-sabanalarga  { background: #6D28D9; }
+        .bg-sanjeronimo  { background: #7C3AED; }
+        .bg-santafe      { background: #6B21A8; }
+        .bg-sopetran     { background: #4C1D95; }
+
+        .content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out; background: #F1F5F9; }
+        .show { max-height: 20000px; }
+
+        /* ── CARPETAS ── */
+        .grupo-item { padding: 10px 14px; }
+        .grupo-btn { width: 100%; padding: 11px 14px; margin: 5px 0; text-align: left; background: var(--azul-claro); border: 1px solid #C7D2FE; border-radius: 8px; cursor: pointer; font-weight: bold; color: #3730A3; font-size: 14px; display: flex; justify-content: space-between; }
+        .grupo-btn:hover { background: #C7D2FE; }
+
+        /* ── CONTACTOS ── */
+        .contactos { display: none; background: white; border-radius: 8px; margin: 4px 0 8px 0; border-left: 5px solid var(--morado); }
+        .visible { display: block !important; }
+
+        .contacto-item { padding: 10px 14px; border-bottom: 1px solid #EEF2FF; }
+        .contacto-item:last-child { border-bottom: none; }
+
+        .cargo { font-size: 10px; color: var(--morado); text-transform: uppercase; font-weight: bold; margin-bottom: 3px; letter-spacing: 1px; }
+        .nombre-click { color: var(--azul); cursor: pointer; font-size: 15px; font-weight: bold; text-decoration: underline; display: inline-block; margin-bottom: 3px; }
+        .nombre-click:hover { color: #1D4ED8; }
+
+        .info-final { display: none; padding: 8px 10px; background: #F5F3FF; border-radius: 6px; font-size: 13px; border: 1px dashed #DDD6FE; margin-top: 5px; }
+        .info-final.visible { display: block !important; }
+
+        .iline { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; flex-wrap: wrap; }
+        .iline:last-child { margin-bottom: 0; }
+        .iline svg { fill: var(--morado); flex-shrink: 0; vertical-align: middle; }
+        .iline a { color: var(--azul); text-decoration: none; font-weight: bold; word-break: break-all; }
+        .iline a:hover { text-decoration: underline; }
+
+        .sin-contactos { font-size: 12px; color: #94A3B8; text-align: center; padding: 12px; font-style: italic; }
+
+        /* ── BARRA ADMIN ── */
+        #admin-bar { display: none; background: #EDE9FE; border: 1px solid #C4B5FD; border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; gap: 8px; flex-wrap: wrap; align-items: center; }
+        #admin-bar.visible-flex { display: flex !important; }
+        #admin-bar span { font-size: 12px; font-weight: bold; color: #5B21B6; letter-spacing: 1px; }
+        .ab { background: white; border: 1px solid #C4B5FD; border-radius: 7px; color: #5B21B6; font-family: 'Segoe UI', sans-serif; font-size: 12px; font-weight: bold; padding: 6px 12px; cursor: pointer; }
+        .ab:hover { background: #DDD6FE; }
+        .ab-red { color: #DC2626; border-color: #FECACA; }
+        .ab-red:hover { background: #FEF2F2; }
+        .ab-green { color: #065F46; border-color: #6EE7B7; }
+        .ab-green:hover { background: #ECFDF5; }
+
+        /* ── MODO EDITOR ── */
+        body.edit-mode .contacto-item { border: 1px dashed #C4B5FD; border-radius: 6px; margin-bottom: 3px; }
+        .edit-btn { display: none; background: #EDE9FE; border: 1px solid #C4B5FD; border-radius: 5px; color: #5B21B6; font-size: 11px; font-weight: bold; padding: 2px 8px; cursor: pointer; margin-left: 6px; font-family: 'Segoe UI', sans-serif; }
+        body.edit-mode .edit-btn { display: inline; }
+        .add-contacto-btn { display: none; width: 100%; text-align: center; background: #F0FDF4; border: 1px dashed #86EFAC; border-radius: 7px; color: #166534; font-size: 12px; font-weight: bold; padding: 8px; cursor: pointer; margin-top: 5px; font-family: 'Segoe UI', sans-serif; }
+        body.edit-mode .add-contacto-btn { display: block; }
+
+        /* ── MODAL ── */
+        #modal-fondo { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 999; align-items: center; justify-content: center; padding: 14px; }
+        #modal-fondo.visible-flex { display: flex !important; }
+        .modal { background: white; border-radius: 14px; padding: 26px; width: min(480px, 100%); box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; }
+        .modal h3 { color: #2E1065; font-size: 16px; margin: 0 0 18px 0; }
+        .modal label { display: block; font-size: 11px; color: #5B21B6; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+        .modal input, .modal select { width: 100%; border: 1px solid #C7D2FE; border-radius: 7px; padding: 9px 12px; font-size: 14px; font-family: 'Segoe UI', sans-serif; margin-bottom: 13px; outline: none; box-sizing: border-box; color: #1E1B4B; }
+        .modal input:focus, .modal select:focus { border-color: #7C3AED; }
+        .modal-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+        .modal-btns button { flex: 1; padding: 10px; border-radius: 8px; border: none; font-family: 'Segoe UI', sans-serif; font-weight: bold; font-size: 13px; cursor: pointer; min-width: 80px; }
+        .btn-guardar { background: #5B21B6; color: white; }
+        .btn-guardar:hover { background: #4C1D95; }
+        .btn-eliminar { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA !important; }
+        .btn-eliminar:hover { background: #FEE2E2; }
+        .btn-cancelar { background: #F1F5F9; color: #64748B; }
+        .btn-cancelar:hover { background: #E2E8F0; }
+
+        /* ── BOTÓN COMPARTIR ── */
+        .btn-compartir { background: white; border: 1px solid #C4B5FD; border-radius: 7px; color: #5B21B6; font-size: 11px; font-weight: bold; padding: 4px 10px; cursor: pointer; font-family: 'Segoe UI', sans-serif; margin-left: 6px; white-space: nowrap; }
+        .btn-compartir:hover { background: #EDE9FE; }
+
+        /* ── MODAL COMPARTIR ── */
+        #comp-fondo { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 1001; align-items: center; justify-content: center; padding: 14px; }
+        #comp-fondo.visible-flex { display: flex !important; }
+        .comp-modal { background: white; border-radius: 14px; padding: 26px; width: min(460px, 100%); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .comp-modal h3 { color: #2E1065; font-size: 16px; margin: 0 0 6px 0; }
+        .comp-modal .subtitulo { font-size: 12px; color: #64748B; margin-bottom: 18px; }
+        .comp-bloque { background: #F5F3FF; border: 1px solid #DDD6FE; border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+        .comp-bloque label { font-size: 11px; color: #5B21B6; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 6px; }
+        .comp-url { width: 100%; border: 1px solid #C7D2FE; border-radius: 7px; padding: 9px 12px; font-size: 12px; font-family: monospace; color: #1E1B4B; background: white; box-sizing: border-box; word-break: break-all; resize: none; height: 58px; outline: none; }
+        .comp-clave { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+        .comp-clave span { font-size: 12px; color: #475569; }
+        .comp-clave strong { font-size: 14px; color: #2E1065; letter-spacing: 2px; font-family: monospace; }
+        .comp-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+        .comp-btns button { flex: 1; padding: 10px; border-radius: 8px; border: none; font-family: 'Segoe UI', sans-serif; font-weight: bold; font-size: 13px; cursor: pointer; min-width: 100px; }
+        .btn-copiar-url { background: #5B21B6; color: white; }
+        .btn-copiar-url:hover { background: #4C1D95; }
+        .btn-wsp { background: #16A34A; color: white; }
+        .btn-wsp:hover { background: #15803D; }
+        .btn-cerrar-comp { background: #F1F5F9; color: #64748B; }
+
+        /* ── MODAL CAMBIAR CLAVE ── */
+        #clave-fondo { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 1002; align-items: center; justify-content: center; padding: 14px; }
+        #clave-fondo.visible-flex { display: flex !important; }
+        .clave-modal { background: white; border-radius: 14px; padding: 26px; width: min(420px, 100%); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .clave-modal h3 { color: #2E1065; font-size: 16px; margin: 0 0 16px 0; }
+        .clave-modal label { display: block; font-size: 11px; color: #5B21B6; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px; }
+        .clave-modal input { width: 100%; border: 1px solid #C7D2FE; border-radius: 7px; padding: 9px 12px; font-size: 14px; font-family: 'Segoe UI', sans-serif; margin-bottom: 14px; outline: none; box-sizing: border-box; }
+        .clave-modal input:focus { border-color: #7C3AED; }
+        .clave-btns { display: flex; gap: 8px; }
+        .clave-btns button { flex: 1; padding: 10px; border-radius: 8px; border: none; font-family: 'Segoe UI', sans-serif; font-weight: bold; font-size: 13px; cursor: pointer; }
+
+        /* ── MODAL EXPORTAR ── */
+        #exp-fondo { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 14px; }
+        #exp-fondo.visible-flex { display: flex !important; }
+        .exp-modal { background: white; border-radius: 14px; padding: 26px; width: min(580px, 100%); box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; }
+        .exp-modal h3 { color: #065F46; font-size: 16px; margin: 0 0 10px 0; }
+        .exp-modal p { font-size: 13px; color: #475569; line-height: 1.7; margin-bottom: 14px; }
+        .exp-modal p strong { color: #1E1B4B; }
+        .exp-modal textarea { width: 100%; border: 1px solid #C7D2FE; border-radius: 8px; padding: 10px; font-size: 11px; font-family: monospace; height: 160px; resize: none; box-sizing: border-box; margin-bottom: 14px; color: #475569; }
+        .exp-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+        .exp-btns button { flex: 1; padding: 10px; border-radius: 8px; border: none; font-family: 'Segoe UI', sans-serif; font-weight: bold; font-size: 13px; cursor: pointer; min-width: 100px; }
+        .btn-copiar { background: #5B21B6; color: white; }
+        .btn-descargar { background: #065F46; color: white; }
+        .btn-cerrar-exp { background: #F1F5F9; color: #64748B; }
+    </style>
+</head>
+<body>
+
+<h1 id="titulo-principal">🔷 Directorio Territorial Occidente</h1>
+
+<!-- BARRA ADMIN -->
+<div id="admin-bar">
+    <span>⚙ MODO ADMIN</span>
+    <button class="ab" id="btn-editor" onclick="toggleEditor()">✏️ Activar editor</button>
+    <button class="ab ab-green" onclick="abrirNuevoGlobal()">＋ Nuevo contacto</button>
+    <button class="ab ab-green" onclick="mostrarExportar()">💾 Guardar cambios</button>
+    <button class="ab ab-red" onclick="salirAdmin()">🔒 Salir</button>
+</div>
+
+<div id="lista"></div>
+
+<!-- MODAL CONTACTO -->
+<div id="modal-fondo">
+    <div class="modal">
+        <h3 id="modal-titulo">Contacto</h3>
+        <label>Municipio</label>
+        <select id="m-mun" onchange="actualizarCarpetas()"></select>
+        <label>Carpeta</label>
+        <select id="m-carpeta"></select>
+        <label>Cargo</label>
+        <input id="m-cargo" type="text" placeholder="Ej: Alcalde Municipal">
+        <label>Nombre completo</label>
+        <input id="m-nombre" type="text" placeholder="Ej: JUAN PÉREZ GARCÍA">
+        <label>Teléfono(s)</label>
+        <input id="m-tel" type="text" placeholder="Ej: 3001234567 / 3009876543">
+        <label>Correo electrónico</label>
+        <input id="m-email" type="text" placeholder="Ej: cargo@municipio.gov.co">
+        <div class="modal-btns">
+            <button class="btn-guardar" onclick="guardarContacto()">Guardar</button>
+            <button class="btn-eliminar" id="btn-eliminar" onclick="eliminarContacto()" style="display:none">Eliminar</button>
+            <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL COMPARTIR -->
+<div id="comp-fondo">
+    <div class="comp-modal">
+        <h3 id="comp-titulo">Compartir municipio</h3>
+        <p class="subtitulo">Comparte este enlace — solo mostrará los datos de este municipio.</p>
+        <div class="comp-bloque">
+            <label>🔗 Enlace directo</label>
+            <textarea class="comp-url" id="comp-url" readonly></textarea>
+            <div class="comp-clave">
+                <span>🔑 Contraseña del municipio:</span>
+                <strong id="comp-clave-txt"></strong>
+            </div>
+        </div>
+        <div class="comp-btns">
+            <button class="btn-copiar-url" onclick="copiarEnlace()">📋 Copiar enlace</button>
+            <button class="btn-wsp" onclick="compartirWhatsApp()">💬 WhatsApp</button>
+            <button class="btn-cerrar-comp" onclick="cerrarCompartir()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CAMBIAR CLAVE MUNICIPIO (solo admin) -->
+<div id="clave-fondo">
+    <div class="clave-modal">
+        <h3 id="clave-titulo">Cambiar contraseña</h3>
+        <label>Nueva contraseña para este municipio</label>
+        <input type="text" id="clave-nueva" placeholder="Ej: Caicedo2026">
+        <div class="clave-btns">
+            <button style="background:#5B21B6;color:white;" onclick="guardarClaveMunicipio()">Guardar</button>
+            <button style="background:#F1F5F9;color:#64748B;" onclick="cerrarClave()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EXPORTAR -->
+<div id="exp-fondo">
+    <div class="exp-modal">
+        <h3>💾 Guardar cambios permanentes</h3>
+        <p>
+            Sigue estos pasos para que tus cambios queden grabados en el archivo:<br>
+            <strong>1.</strong> Haz clic en <strong>⬇ Descargar</strong> — se descarga el archivo actualizado.<br>
+            <strong>2.</strong> Reemplaza el archivo anterior con el nuevo.<br>
+            <strong>3.</strong> ¡Listo! Los cambios quedan grabados para siempre.
+        </p>
+        <textarea id="exp-codigo" readonly></textarea>
+        <div class="exp-btns">
+            <button class="btn-copiar" onclick="copiarCodigo()">📋 Copiar código</button>
+            <button class="btn-descargar" onclick="descargarHTML()">⬇ Descargar archivo</button>
+            <button class="btn-cerrar-exp" onclick="cerrarExportar()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  CONTRASEÑAS
+// ══════════════════════════════════════════
+var CLAVE_LECTOR = "Occidente2026";
+var CLAVE_ADMIN  = "Admin2026";
+
+// ══════════════════════════════════════════
+//  MUNICIPIOS
+// ══════════════════════════════════════════
+var MUNICIPIOS = [
+    {id:"anza",        nombre:"ANZÁ",           bg:"bg-anza"},
+    {id:"buritica",    nombre:"BURITICÁ",        bg:"bg-buritica"},
+    {id:"caicedo",     nombre:"CAICEDO",         bg:"bg-caicedo"},
+    {id:"ebejico",     nombre:"EBÉJICO",         bg:"bg-ebejico"},
+    {id:"liborina",    nombre:"LIBORINA",        bg:"bg-liborina"},
+    {id:"olaya",       nombre:"OLAYA",           bg:"bg-olaya"},
+    {id:"sabanalarga", nombre:"SABANALARGA",     bg:"bg-sabanalarga"},
+    {id:"sanjeronimo", nombre:"SAN JERÓNIMO",    bg:"bg-sanjeronimo"},
+    {id:"santafe",     nombre:"STA. FE DE ANT.", bg:"bg-santafe"},
+    {id:"sopetran",    nombre:"SOPETRÁN",        bg:"bg-sopetran"}
+];
+
+// ══════════════════════════════════════════
+//  CARPETAS
+// ══════════════════════════════════════════
+var CARPETAS = [
+    {key:"adm", label:"Administración Municipal",   icon:"🏛️"},
+    {key:"con", label:"Concejo Municipal",           icon:"⚖️"},
+    {key:"jac", label:"Junta de Acción Comunal",     icon:"🤝"},
+    {key:"edu", label:"Comunidad Educativa",         icon:"🎓"},
+    {key:"acu", label:"Acueductos Veredales",        icon:"💧"},
+    {key:"muj", label:"Líderes de Mujeres",          icon:"👩"},
+    {key:"red", label:"Red de Apoyo Institucional",  icon:"🌐"}
+];
+
+// ══════════════════════════════════════════
+//  BASE DE DATOS — TODOS LOS CONTACTOS
+// ══════════════════════════════════════════
+var DB = {
+  caicedo: {
+    adm: [
+      {cargo:"Alcalde Municipal",                           nombre:"YUBER FELIPE MOLINA MURILLO", tel:"604 857 20 02",         email:"alcaldia@caicedo-antioquia.gov.co"},
+      {cargo:"Secretario de Gobierno y Servicios Adm.",    nombre:"",                            tel:"3235960216",            email:"gobierno@caicedo-antioquia.gov.co"},
+      {cargo:"Secretaría de Salud, Educación y Bienestar", nombre:"",                            tel:"8572002 ext 108",       email:"Salud@caicedo-antioquia.gov.co"},
+      {cargo:"Secretaria de Hacienda",                     nombre:"",                            tel:"8572002 ext 117",       email:"hacienda@caicedo-antioquia.gov.co"},
+      {cargo:"Coordinadora UMATA",                         nombre:"",                            tel:"3136077216",            email:"umata@caicedo-antioquia.gov.co medioambiente@caicedo-antioquia.gov.co productividad@caicedo-antioquia.gov.co"},
+      {cargo:"Unidad Municipal de Servicios Públicos",     nombre:"",                            tel:"3205657577",            email:"serviciospublicos@caicedo-antioquia.gov.co"},
+      {cargo:"Inspección de Policía",                      nombre:"",                            tel:"3226157536",            email:"inspeccion@caicedo-antioquia.gov.co"},
+      {cargo:"Auxiliar de Planeación",                     nombre:"",                            tel:"3136084193",            email:"Gestiondelriesgo@caicedo-antioquia.gov.co"},
+      {cargo:"Auxiliar UMATA",                             nombre:"",                            tel:"3115963263",            email:"umata@caicedo-antioquia.gov.co"},
+      {cargo:"Sector Ejecutivo",                           nombre:"",                            tel:"3113518141",            email:"Alcaldia@caicedo-antioquia.gov.co"},
+      {cargo:"Participación Ciudadana",                    nombre:"",                            tel:"3217053071",            email:"Caicedovivienda@gmail.com"}
+    ],
+    con: [
+      {cargo:"PRESIDENTE",            nombre:"", tel:"3108381194", email:"concejo@caicedo-antioquia.gov.co"},
+      {cargo:"VICEPRESIDENTE PRIMERO",nombre:"", tel:"3137220621", email:""},
+      {cargo:"VICEPRESIDENTE SEGUNDO",nombre:"", tel:"3507316087", email:""},
+      {cargo:"CONCEJAL",              nombre:"", tel:"3117473409", email:""},
+      {cargo:"CONCEJAL",              nombre:"", tel:"3137368417", email:""},
+      {cargo:"CONCEJAL",              nombre:"", tel:"3104308968", email:""},
+      {cargo:"CONCEJAL",              nombre:"", tel:"3508376369", email:""},
+      {cargo:"CONCEJAL",              nombre:"", tel:"3122991919", email:""},
+      {cargo:"CONCEJAL",              nombre:"", tel:"3207013100", email:""},
+      {cargo:"SECRETARIA",            nombre:"", tel:"3145807749", email:""}
+    ],
+    jac: [
+      {cargo:"Presidente JAC", nombre:"DANIEL FERNANDO ÚSUGA", tel:"3137255146", email:"hevexicos@corantioquia.gov.co"},
+      {cargo:"Presidente", nombre:"", tel:"3044221040",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3127875299",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3016826912",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3504170149",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3147210980",  email:"villermolina1984@hotmail.com"},
+      {cargo:"Presidente", nombre:"", tel:"3122763900",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3235235815",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3122774673",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3117859530",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3215841411",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3215852501",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3042219175",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3217861348",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3102631895",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3105918266",  email:"wilid1234@gmail.com"},
+      {cargo:"Presidente", nombre:"", tel:"3235285515",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3122762094",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3203844666",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3042244055",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3503661624",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3113258713",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3117357965",  email:""},
+      {cargo:"Presidente", nombre:"", tel:"3116069454",  email:"juandedios2380@gmail.com"}
+    ],
+    edu: [
+      {cargo:"Rector I.E San Juan Bosco", nombre:"", tel:"3136517009", email:"migdoniorios@hotmail.com"},
+      {cargo:"Docente", nombre:"", tel:"3207095993", email:""},
+      {cargo:"Docente", nombre:"", tel:"3117028696", email:""},
+      {cargo:"Docente", nombre:"", tel:"3193799260", email:""},
+      {cargo:"Docente", nombre:"", tel:"3104140355", email:""},
+      {cargo:"Docente", nombre:"", tel:"3127151601", email:""},
+      {cargo:"Docente", nombre:"", tel:"3147223014", email:""},
+      {cargo:"Docente", nombre:"", tel:"3117307683", email:""},
+      {cargo:"Docente", nombre:"", tel:"3103455291", email:""},
+      {cargo:"Docente", nombre:"", tel:"3104691392", email:""},
+      {cargo:"Docente", nombre:"", tel:"3203099746", email:""},
+      {cargo:"Docente", nombre:"", tel:"3102596057", email:""},
+      {cargo:"Docente", nombre:"", tel:"3128379599", email:""},
+      {cargo:"Docente", nombre:"", tel:"3148308800", email:""},
+      {cargo:"Docente", nombre:"", tel:"3105467522", email:""},
+      {cargo:"Docente", nombre:"", tel:"3106107506", email:""}
+    ],
+    acu: [
+      {cargo:"Representante", nombre:"", tel:"3502319691",              email:""},
+      {cargo:"Representante", nombre:"", tel:"3108353898",              email:""},
+      {cargo:"Representante", nombre:"", tel:"3245500391 / 3234896078", email:""},
+      {cargo:"Representante", nombre:"", tel:"3103665657",              email:""},
+      {cargo:"Representante", nombre:"", tel:"3146407117",              email:""},
+      {cargo:"Representante", nombre:"", tel:"3246851445",              email:""},
+      {cargo:"Representante", nombre:"", tel:"3108729712",              email:""},
+      {cargo:"Representante", nombre:"", tel:"3146912248 / 3122372645", email:""},
+      {cargo:"Representante", nombre:"", tel:"3216426188",              email:""},
+      {cargo:"Representante", nombre:"", tel:"3135777409",              email:""},
+      {cargo:"Representante", nombre:"", tel:"3052041338 / 3122762069", email:""},
+      {cargo:"Representante", nombre:"", tel:"",                         email:""},
+      {cargo:"Representante", nombre:"", tel:"3105918266",              email:""},
+      {cargo:"Representante", nombre:"", tel:"3206211221",              email:""},
+      {cargo:"Representante", nombre:"", tel:"310 7240623",             email:""}
+    ],
+    muj: [
+      {cargo:"Líder",              nombre:"", tel:"3122792702", email:""},
+      {cargo:"Cuidadoras de Vida", nombre:"", tel:"3127980749", email:""},
+      {cargo:"Gestora Social",     nombre:"", tel:"3113951547", email:""},
+      {cargo:"Equidad de Género",  nombre:"", tel:"3105254301", email:""}
+    ],
+    red: [
+      {cargo:"Coordinadora",                    nombre:"", tel:"3207063838",     email:""},
+      {cargo:"Representante",                   nombre:"", tel:"3113779783",     email:"uranmolinal@gmail.com"},
+      {cargo:"Representante Natour Caicedo",    nombre:"", tel:"3229155882",     email:"danielhiguita7@gmail.com"},
+      {cargo:"Café Caicedo",                    nombre:"", tel:"3147482358",     email:"cafecaicedo@gmail.com"},
+      {cargo:"Comerciante",                     nombre:"", tel:"3104308968",     email:""},
+      {cargo:"Policía Caicedo",                 nombre:"", tel:"8572040 / 2043", email:"deant.ecaicedo@policia.gov.co"},
+      {cargo:"Párroco",                         nombre:"", tel:"8572005",        email:"parroquiadecaicedo@gmail.com"},
+      {cargo:"Psicóloga - Comisaria",           nombre:"", tel:"3113729097",     email:"Comisaria@caicedo-antioquia.gov.co"},
+      {cargo:"Trabajadora Social - Comisaria",  nombre:"", tel:"3105470716",     email:"Comisaria@caicedo-antioquia.gov.co"},
+      {cargo:"Comisaria",                       nombre:"", tel:"3122452573",     email:"Comisaria@caicedo-antioquia.gov.co"},
+      {cargo:"Salud",                           nombre:"", tel:"3136057022",     email:"aseguramiento@caicedo-antioquia.gov.co"},
+      {cargo:"Hacienda",                        nombre:"", tel:"3215634707",     email:"presupuesto@caicedo-antioquia.gov.co"},
+      {cargo:"Enlace PAC",                      nombre:"", tel:"3136813606",     email:"caicedo.pac@gmail.com"}
+    ]
+  },
+  anza:        {adm:[],con:[],jac:[],edu:[],acu:[],muj:[],red:[]},
+  buritica:    {adm:[],con:[],jac:[],edu:[],acu:[],muj:[],red:[]},
+  ebejico:     {adm:[],con:[],jac:[],edu:[],acu:[],muj:[],red:[]},
+  liborina:    {adm:[],con:[],jac:[],edu:[],acu:[],muj:[],red:[]},
+  olaya:       {adm:[],con:[],jac:[],edu:[],acu:[],muj:[],red:[]},
+  sabanalarga: {adm:[],con:[],jac:[],edu:[],acu:[],muj:[],red:[]},
+  sanjeronimo: {adm:[],con:[],jac:[],edu:[],acu:[],muj:[],red:[]},
+  santafe:     {adm:[],con:[],jac:[],edu:[],acu:[],muj:[],red:[]},
+  sopetran:    {adm:[],con:[],jac:[],edu:[],acu:[],muj:[],red:[]}
+};
+
+// ══════════════════════════════════════════
+//  CLAVES POR MUNICIPIO
+// ══════════════════════════════════════════
+var CLAVES_MUN = {
+    anza:        "Anza2026",
+    buritica:    "Buritica2026",
+    caicedo:     "Caicedo2026",
+    ebejico:     "Ebejico2026",
+    liborina:    "Liborina2026",
+    olaya:       "Olaya2026",
+    sabanalarga: "Sabanalarga2026",
+    sanjeronimo: "SanJeronimo2026",
+    santafe:     "SantaFe2026",
+    sopetran:    "Sopetran2026"
+};
+
+// ══════════════════════════════════════════
+//  ESTADO
+// ══════════════════════════════════════════
+var esAdmin      = false;
+var editando     = false;
+var refEditar    = null;
+var munFiltro    = null; // municipio único si viene de enlace directo
+var munCompartir = null;
+var munClave     = null;
+
+// ══════════════════════════════════════════
+//  ACCESO — detecta si es enlace de municipio
+// ══════════════════════════════════════════
+(function() {
+    var params = new URLSearchParams(window.location.search);
+    var mun = params.get("municipio");
+
+    if (mun && CLAVES_MUN[mun]) {
+        // ── Modo municipio individual ──
+        munFiltro = mun;
+        var dataMun = MUNICIPIOS.find(function(m){ return m.id === mun; });
+        var clave = prompt("🔷 Directorio — " + (dataMun ? dataMun.nombre : mun.toUpperCase()) + "\nIngresa la contraseña:");
+        if (clave === CLAVES_MUN[mun] || clave === CLAVE_ADMIN) {
+            esAdmin = (clave === CLAVE_ADMIN);
+            document.body.style.display = "block";
+            document.getElementById("titulo-principal").textContent =
+                "🔷 " + (dataMun ? dataMun.nombre : mun.toUpperCase()) + " — Occidente";
+            construirDirectorio();
+            if (esAdmin) document.getElementById("admin-bar").classList.add("visible-flex");
+        } else {
+            alert("Acceso denegado.");
+            document.location.reload();
+        }
+    } else {
+        // ── Modo directorio completo ──
+        var clave = prompt("🔷 Directorio Territorial Occidente\nIngresa la contraseña:");
+        if (clave === CLAVE_LECTOR || clave === CLAVE_ADMIN) {
+            esAdmin = (clave === CLAVE_ADMIN);
+            document.body.style.display = "block";
+            construirDirectorio();
+            if (esAdmin) document.getElementById("admin-bar").classList.add("visible-flex");
+        } else {
+            alert("Acceso denegado.");
+            document.location.reload();
+        }
+    }
+})();
+
+// ══════════════════════════════════════════
+//  CONSTRUIR DIRECTORIO
+// ══════════════════════════════════════════
+function construirDirectorio() {
+    var lista = document.getElementById("lista");
+    lista.innerHTML = "";
+    var lista_mun = munFiltro
+        ? MUNICIPIOS.filter(function(m){ return m.id === munFiltro; })
+        : MUNICIPIOS;
+    lista_mun.forEach(function(m) {
+        lista.appendChild(crearMunicipio(m));
+    });
+}
+
+function crearMunicipio(m) {
+    var div = document.createElement("div");
+    div.className = "municipio";
+    div.id = "mun-" + m.id;
+
+    var hdr = document.createElement("div");
+    hdr.style.cssText = "display:flex;align-items:stretch;";
+
+    var btn = document.createElement("button");
+    btn.className = "m-header " + m.bg;
+    btn.style.flex = "1";
+    btn.innerHTML = m.nombre + " <span>▼</span>";
+    btn.onclick = function() { toggleContenido("cont-" + m.id); };
+
+    // Botón compartir (siempre visible)
+    var btnComp = document.createElement("button");
+    btnComp.className = "m-header " + m.bg;
+    btnComp.style.cssText = "flex:0;padding:0 16px;border-left:1px solid rgba(255,255,255,0.2);font-size:16px;";
+    btnComp.title = "Compartir " + m.nombre;
+    btnComp.innerHTML = "🔗";
+    btnComp.onclick = function(e) { e.stopPropagation(); abrirCompartir(m.id); };
+
+    hdr.appendChild(btn);
+    hdr.appendChild(btnComp);
+
+    var cont = document.createElement("div");
+    cont.className = "content";
+    cont.id = "cont-" + m.id;
+
+    var item = document.createElement("div");
+    item.className = "grupo-item";
+    item.id = "body-" + m.id;
+
+    CARPETAS.forEach(function(f) {
+        item.appendChild(crearCarpeta(m.id, f));
+    });
+
+    // Botón cambiar clave (solo admin, en modo completo)
+    if (esAdmin && !munFiltro) {
+        var btnClave = document.createElement("button");
+        btnClave.className = "ab";
+        btnClave.style.cssText = "margin:0 0 8px 0;font-size:11px;";
+        btnClave.textContent = "🔑 Cambiar contraseña del municipio";
+        btnClave.onclick = function() { abrirClave(m.id); };
+        item.insertBefore(btnClave, item.firstChild);
+    }
+
+    cont.appendChild(item);
+    div.appendChild(hdr);
+    div.appendChild(cont);
+    return div;
+}
+
+function crearCarpeta(munId, f) {
+    var cid = "carp-" + munId + "-" + f.key;
+    var wrap = document.createElement("div");
+
+    var btn = document.createElement("button");
+    btn.className = "grupo-btn";
+    btn.id = "cbtn-" + cid;
+    btn.innerHTML = f.icon + " " + f.label + " <span>▼</span>";
+    btn.onclick = function() { toggleCarpeta(cid); };
+
+    var cont = document.createElement("div");
+    cont.className = "contactos";
+    cont.id = cid;
+    cont.setAttribute("data-mun", munId);
+    cont.setAttribute("data-fkey", f.key);
+
+    refrescarCarpeta(cont, munId, f.key);
+
+    wrap.appendChild(btn);
+    wrap.appendChild(cont);
+    return wrap;
+}
+
+function refrescarCarpeta(cont, munId, fkey) {
+    cont.innerHTML = "";
+    var lista = (DB[munId] && DB[munId][fkey]) ? DB[munId][fkey] : [];
+
+    if (lista.length === 0) {
+        var p = document.createElement("p");
+        p.className = "sin-contactos";
+        p.textContent = "Sin contactos registrados";
+        cont.appendChild(p);
+    } else {
+        lista.forEach(function(c, i) {
+            cont.appendChild(crearTarjeta(munId, fkey, c, i));
+        });
+    }
+
+    var addBtn = document.createElement("button");
+    addBtn.className = "add-contacto-btn";
+    addBtn.textContent = "+ Agregar contacto en esta carpeta";
+    addBtn.onclick = function() { abrirNuevo(munId, fkey); };
+    cont.appendChild(addBtn);
+}
+
+function crearTarjeta(munId, fkey, c, idx) {
+    var tid = "t-" + munId + "-" + fkey + "-" + idx;
+    var iid = "i-" + munId + "-" + fkey + "-" + idx;
+
+    var item = document.createElement("div");
+    item.className = "contacto-item";
+    item.id = tid;
+
+    var cargo = document.createElement("div");
+    cargo.className = "cargo";
+    cargo.textContent = c.cargo || "";
+
+    var fila = document.createElement("div");
+    fila.style.cssText = "display:flex;align-items:center;flex-wrap:wrap;gap:4px;";
+
+    var nom = document.createElement("span");
+    nom.className = "nombre-click";
+    nom.id = "n-" + tid;
+    var etiqueta = (c.nombre && c.nombre.trim()) ? c.nombre : (c.tel || "Ver contacto");
+    nom.textContent = etiqueta;
+    nom.onclick = function() { toggleInfo(iid); };
+
+    var eb = document.createElement("button");
+    eb.className = "edit-btn";
+    eb.textContent = "✏️";
+    eb.title = "Editar";
+    eb.onclick = function(e) { e.stopPropagation(); abrirEditar(munId, fkey, idx); };
+
+    fila.appendChild(nom);
+    fila.appendChild(eb);
+
+    var info = document.createElement("div");
+    info.className = "info-final";
+    info.id = iid;
+    info.innerHTML = construirInfo(c);
+
+    item.appendChild(cargo);
+    item.appendChild(fila);
+    item.appendChild(info);
+    return item;
+}
+
+function construirInfo(c) {
+    var html = "";
+    if (c.tel) {
+        c.tel.split("/").map(function(t) { return t.trim(); }).filter(Boolean).forEach(function(t) {
+            var cl = t.replace(/\s/g, "");
+            html += '<div class="iline">' + svgTel() + '<a href="tel:' + cl + '">' + t + '</a></div>';
+        });
+    }
+    if (c.email) {
+        c.email.split(/[\s,;]+/).filter(function(e) { return e.indexOf("@") > -1; }).forEach(function(em) {
+            html += '<div class="iline">' + svgEmail() + '<a href="mailto:' + em + '">' + em + '</a></div>';
+        });
+    }
+    if (!html) html = '<span style="color:#94A3B8;font-style:italic;font-size:12px">Sin información de contacto</span>';
+    return html;
+}
+
+// ══════════════════════════════════════════
+//  TOGGLES
+// ══════════════════════════════════════════
+function toggleContenido(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.toggle("show");
+}
+function toggleCarpeta(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.toggle("visible");
+}
+function toggleInfo(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.toggle("visible");
+}
+
+// ══════════════════════════════════════════
+//  MODO EDITOR
+// ══════════════════════════════════════════
+function toggleEditor() {
+    editando = !editando;
+    document.body.classList.toggle("edit-mode", editando);
+    document.getElementById("btn-editor").textContent = editando ? "🔒 Desactivar editor" : "✏️ Activar editor";
+}
+function salirAdmin() {
+    esAdmin = false; editando = false;
+    document.body.classList.remove("edit-mode");
+    document.getElementById("admin-bar").classList.remove("visible-flex");
+    document.getElementById("btn-editor").textContent = "✏️ Activar editor";
+}
+
+// ══════════════════════════════════════════
+//  MODAL CONTACTO
+// ══════════════════════════════════════════
+function llenarMunicipioSel(selId) {
+    var sel = document.getElementById(selId);
+    sel.innerHTML = "";
+    MUNICIPIOS.forEach(function(m) {
+        var o = document.createElement("option");
+        o.value = m.id; o.textContent = m.nombre;
+        sel.appendChild(o);
+    });
+}
+function actualizarCarpetas(selFkey) {
+    var sel = document.getElementById("m-carpeta");
+    sel.innerHTML = "";
+    CARPETAS.forEach(function(f) {
+        var o = document.createElement("option");
+        o.value = f.key; o.textContent = f.label;
+        if (f.key === selFkey) o.selected = true;
+        sel.appendChild(o);
+    });
+}
+function abrirNuevo(munId, fkey) {
+    if (!esAdmin) return;
+    refEditar = null;
+    document.getElementById("modal-titulo").textContent = "➕ Nuevo Contacto";
+    document.getElementById("btn-eliminar").style.display = "none";
+    llenarMunicipioSel("m-mun");
+    document.getElementById("m-mun").value = munId;
+    actualizarCarpetas(fkey);
+    limpiarCampos();
+    document.getElementById("modal-fondo").classList.add("visible-flex");
+}
+function abrirNuevoGlobal() { abrirNuevo(MUNICIPIOS[0].id, CARPETAS[0].key); }
+function abrirEditar(munId, fkey, idx) {
+    if (!esAdmin) return;
+    var c = DB[munId][fkey][idx];
+    refEditar = {munId: munId, fkey: fkey, idx: idx};
+    document.getElementById("modal-titulo").textContent = "✏️ Editar Contacto";
+    document.getElementById("btn-eliminar").style.display = "block";
+    llenarMunicipioSel("m-mun");
+    document.getElementById("m-mun").value = munId;
+    actualizarCarpetas(fkey);
+    document.getElementById("m-carpeta").value = fkey;
+    document.getElementById("m-cargo").value  = c.cargo  || "";
+    document.getElementById("m-nombre").value = c.nombre || "";
+    document.getElementById("m-tel").value    = c.tel    || "";
+    document.getElementById("m-email").value  = c.email  || "";
+    document.getElementById("modal-fondo").classList.add("visible-flex");
+}
+function limpiarCampos() {
+    ["m-cargo","m-nombre","m-tel","m-email"].forEach(function(id) {
+        document.getElementById(id).value = "";
+    });
+}
+function guardarContacto() {
+    var munId  = document.getElementById("m-mun").value;
+    var fkey   = document.getElementById("m-carpeta").value;
+    var cargo  = document.getElementById("m-cargo").value.trim();
+    var nombre = document.getElementById("m-nombre").value.trim();
+    var tel    = document.getElementById("m-tel").value.trim();
+    var email  = document.getElementById("m-email").value.trim();
+    if (!cargo && !nombre && !tel) { alert("Ingresa al menos cargo, nombre o teléfono."); return; }
+    if (!DB[munId]) DB[munId] = {};
+    if (!DB[munId][fkey]) DB[munId][fkey] = [];
+    var nc = {cargo: cargo, nombre: nombre, tel: tel, email: email};
+    if (refEditar) {
+        if (refEditar.munId !== munId || refEditar.fkey !== fkey) {
+            DB[refEditar.munId][refEditar.fkey].splice(refEditar.idx, 1);
+            refrescarCarpetaPorId(refEditar.munId, refEditar.fkey);
+            DB[munId][fkey].push(nc);
+        } else {
+            DB[munId][fkey][refEditar.idx] = nc;
+        }
+    } else {
+        DB[munId][fkey].push(nc);
+    }
+    refrescarCarpetaPorId(munId, fkey);
+    abrirCarpetaYMunicipio(munId, fkey);
+    cerrarModal();
+}
+function eliminarContacto() {
+    if (!refEditar) return;
+    if (!confirm("¿Eliminar este contacto definitivamente?")) return;
+    DB[refEditar.munId][refEditar.fkey].splice(refEditar.idx, 1);
+    refrescarCarpetaPorId(refEditar.munId, refEditar.fkey);
+    cerrarModal();
+}
+function refrescarCarpetaPorId(munId, fkey) {
+    var cid  = "carp-" + munId + "-" + fkey;
+    var cont = document.getElementById(cid);
+    if (cont) refrescarCarpeta(cont, munId, fkey);
+}
+function abrirCarpetaYMunicipio(munId, fkey) {
+    var cont = document.getElementById("cont-" + munId);
+    var carp = document.getElementById("carp-" + munId + "-" + fkey);
+    if (cont && !cont.classList.contains("show"))    cont.classList.add("show");
+    if (carp && !carp.classList.contains("visible")) carp.classList.add("visible");
+}
+function cerrarModal() {
+    document.getElementById("modal-fondo").classList.remove("visible-flex");
+    refEditar = null;
+}
+document.getElementById("modal-fondo").addEventListener("click", function(e) {
+    if (e.target === this) cerrarModal();
+});
+
+// ══════════════════════════════════════════
+//  GUARDAR PERMANENTE
+// ══════════════════════════════════════════
+function mostrarExportar() {
+    var html = generarHTML();
+    document.getElementById("exp-codigo").value = html;
+    document.getElementById("exp-fondo").classList.add("visible-flex");
+}
+function cerrarExportar() {
+    document.getElementById("exp-fondo").classList.remove("visible-flex");
+}
+function copiarCodigo() {
+    var ta = document.getElementById("exp-codigo");
+    ta.select(); ta.setSelectionRange(0, 999999999);
+    document.execCommand("copy");
+    alert("✅ Código copiado al portapapeles.");
+}
+function descargarHTML() {
+    var html  = document.getElementById("exp-codigo").value;
+    var blob  = new Blob([html], {type: "text/html;charset=utf-8"});
+    var a     = document.createElement("a");
+    a.href    = URL.createObjectURL(blob);
+    a.download = "directorio_occidente.html";
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
+document.getElementById("exp-fondo").addEventListener("click", function(e) {
+    if (e.target === this) cerrarExportar();
+});
+
+function generarHTML() {
+    var src = document.documentElement.outerHTML;
+    // Actualizar DB
+    var dbNuevo = "var DB = " + JSON.stringify(DB, null, 2) + ";";
+    src = src.replace(/var DB = \{[\s\S]*?\};\n\n\/\/ ══+\n\/\/  ESTADO/, dbNuevo + "\n\n// ══════════════════════════════════════════\n//  CLAVES POR MUNICIPIO");
+    // Actualizar CLAVES_MUN
+    var clavesNuevo = "var CLAVES_MUN = " + JSON.stringify(CLAVES_MUN, null, 4) + ";";
+    src = src.replace(/var CLAVES_MUN = \{[\s\S]*?\};/, clavesNuevo);
+    return src;
+}
+
+// ══════════════════════════════════════════
+//  COMPARTIR MUNICIPIO
+// ══════════════════════════════════════════
+function abrirCompartir(munId) {
+    munCompartir = munId;
+    var dataMun  = MUNICIPIOS.find(function(m){ return m.id === munId; });
+    var base     = window.location.href.split("?")[0];
+    var url      = base + "?municipio=" + munId;
+    var clave    = CLAVES_MUN[munId];
+
+    document.getElementById("comp-titulo").textContent = "🔗 Compartir — " + dataMun.nombre;
+    document.getElementById("comp-url").value = url;
+    document.getElementById("comp-clave-txt").textContent = clave;
+    document.getElementById("comp-fondo").classList.add("visible-flex");
+}
+function cerrarCompartir() {
+    document.getElementById("comp-fondo").classList.remove("visible-flex");
+    munCompartir = null;
+}
+function copiarEnlace() {
+    var url = document.getElementById("comp-url").value;
+    var clave = document.getElementById("comp-clave-txt").textContent;
+    navigator.clipboard.writeText(url).then(function() {
+        alert("✅ Enlace copiado.\n\nRecuerda compartir también la contraseña:\n" + clave);
+    }).catch(function() {
+        // fallback para navegadores sin clipboard API
+        var ta = document.getElementById("comp-url");
+        ta.select(); ta.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+        alert("✅ Enlace copiado.\n\nRecuerda compartir también la contraseña:\n" + clave);
+    });
+}
+function compartirWhatsApp() {
+    var url   = document.getElementById("comp-url").value;
+    var clave = document.getElementById("comp-clave-txt").textContent;
+    var mun   = MUNICIPIOS.find(function(m){ return m.id === munCompartir; });
+    var texto = "🔷 Directorio Territorial — " + mun.nombre
+              + "\n\n📎 Enlace: " + url
+              + "\n🔑 Contraseña: " + clave;
+    window.open("https://wa.me/?text=" + encodeURIComponent(texto), "_blank");
+}
+document.getElementById("comp-fondo").addEventListener("click", function(e) {
+    if (e.target === this) cerrarCompartir();
+});
+
+// ══════════════════════════════════════════
+//  CAMBIAR CLAVE DE MUNICIPIO (solo admin)
+// ══════════════════════════════════════════
+function abrirClave(munId) {
+    if (!esAdmin) return;
+    munClave = munId;
+    var dataMun = MUNICIPIOS.find(function(m){ return m.id === munId; });
+    document.getElementById("clave-titulo").textContent = "🔑 Contraseña — " + dataMun.nombre;
+    document.getElementById("clave-nueva").value = CLAVES_MUN[munId];
+    document.getElementById("clave-fondo").classList.add("visible-flex");
+}
+function cerrarClave() {
+    document.getElementById("clave-fondo").classList.remove("visible-flex");
+    munClave = null;
+}
+function guardarClaveMunicipio() {
+    var nueva = document.getElementById("clave-nueva").value.trim();
+    if (!nueva) { alert("La contraseña no puede estar vacía."); return; }
+    if (nueva === CLAVE_LECTOR || nueva === CLAVE_ADMIN) {
+        alert("Esa contraseña ya está en uso. Elige una diferente."); return;
+    }
+    CLAVES_MUN[munClave] = nueva;
+    cerrarClave();
+    alert("✅ Contraseña actualizada.\n\nRecuerda usar 💾 Guardar cambios para que quede permanente.");
+}
+document.getElementById("clave-fondo").addEventListener("click", function(e) {
+    if (e.target === this) cerrarClave();
+});
+
+// ══════════════════════════════════════════
+//  SVG HELPERS
+// ══════════════════════════════════════════
+function svgTel() {
+    return '<svg width="14" height="14" viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.82 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>';
+}
+function svgEmail() {
+    return '<svg width="14" height="14" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>';
+}
+</script>
+</body>
+</html>
